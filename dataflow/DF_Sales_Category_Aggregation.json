@@ -12,15 +12,32 @@
 					"name": "srcstgsales"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_CategorySales",
+						"type": "DatasetReference"
+					},
+					"name": "SinkCategorySales"
+				}
+			],
 			"transformations": [
 				{
 					"name": "FilterIncremental"
+				},
+				{
+					"name": "FilterOrderDate"
+				},
+				{
+					"name": "AggCategorySales"
+				},
+				{
+					"name": "DrvLoadDate"
 				}
 			],
 			"scriptLines": [
 				"parameters{",
-				"     p_WatermarkDate as string",
+				"     p_WatermarkDate as string ('1900-01-01 00:00:00')",
 				"}",
 				"source(output(",
 				"          order_id as integer,",
@@ -48,7 +65,28 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> srcstgsales",
-				"srcstgsales filter(ERROR_FUNCTION('')) ~> FilterIncremental"
+				"srcstgsales filter(toTimestamp(updated_date) > toTimestamp($p_WatermarkDate)) ~> FilterIncremental",
+				"FilterIncremental filter(year(order_date) == 2026) ~> FilterOrderDate",
+				"FilterOrderDate aggregate(groupBy(category),",
+				"     total_sales = sum(sales_amount),",
+				"          order_count = count(order_id)) ~> AggCategorySales",
+				"AggCategorySales derive(load_date = currentUTC()) ~> DrvLoadDate",
+				"DrvLoadDate sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          category as string,",
+				"          total_sales as decimal(18,2),",
+				"          order_count as integer,",
+				"          load_date as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> SinkCategorySales"
 			]
 		}
 	}
