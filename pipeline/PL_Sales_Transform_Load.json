@@ -15,6 +15,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DF_Sales_Category_Aggregation",
+						"type": "DataFlowReference"
+					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"

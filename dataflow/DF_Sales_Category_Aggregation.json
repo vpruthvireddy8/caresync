@@ -1,0 +1,55 @@
+{
+	"name": "DF_Sales_Category_Aggregation",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_Sales_Stg",
+						"type": "DatasetReference"
+					},
+					"name": "srcstgsales"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "FilterIncremental"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     p_WatermarkDate as string",
+				"}",
+				"source(output(",
+				"          order_id as integer,",
+				"          customer_id as string,",
+				"          product_id as string,",
+				"          product_name as string,",
+				"          category as string,",
+				"          quantity as integer,",
+				"          price as decimal(18,2),",
+				"          discount as decimal(18,2),",
+				"          sales_amount as decimal(18,2),",
+				"          region as string,",
+				"          country as string,",
+				"          sales_rep as string,",
+				"          order_date as date,",
+				"          ship_date as date,",
+				"          status as string,",
+				"          payment_type as string,",
+				"          created_date as timestamp,",
+				"          updated_date as timestamp,",
+				"          year as integer,",
+				"          month as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> srcstgsales",
+				"srcstgsales filter(ERROR_FUNCTION('')) ~> FilterIncremental"
+			]
+		}
+	}
+}
