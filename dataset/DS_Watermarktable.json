@@ -1,0 +1,27 @@
+{
+	"name": "DS_Watermarktable",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_AzureSQL",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "TableName",
+				"type": "varchar"
+			},
+			{
+				"name": "LastLoadDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "WatermarkTable"
+		}
+	}
+}
