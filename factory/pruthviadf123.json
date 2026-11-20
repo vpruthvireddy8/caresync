@@ -1,0 +1,22 @@
+{
+	"name": "pruthviadf123",
+	"properties": {
+		"globalParameters": {
+			"email_recipent": {
+				"type": "string",
+				"value": "vpruthvireddy12@gmail.com"
+			}
+		},
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true,
+			"isExplicitlySet": false
+		}
+	},
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "4b4f880f-351e-4b86-acaf-def01c986ea7",
+		"tenantId": "6be5a6b6-0b38-4e9b-a130-aa758111ef7f"
+	}
+}

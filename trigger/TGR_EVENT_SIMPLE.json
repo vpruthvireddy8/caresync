@@ -1,0 +1,25 @@
+{
+	"name": "TGR_EVENT_SIMPLE",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "PL_FILE_EVENT",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/source/blobs/source_folder",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/05d1bf74-62ce-495a-86ca-929f8b71aadb/resourceGroups/rg-pruthvi/providers/Microsoft.Storage/storageAccounts/pruthviadls",
+			"events": [
+				"Microsoft.Storage.BlobDeleted",
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}

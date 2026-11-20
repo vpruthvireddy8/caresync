@@ -1,0 +1,179 @@
+{
+	"name": "PL_DEMO_APPEND VARIABLE",
+	"properties": {
+		"activities": [
+			{
+				"name": "INGEST ALL TABLES",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "READ LIST OF TABLES",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('READ LIST OF TABLES').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Execute INGESTION PIPELINE",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "PL_SQLDBINGISTION",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"table_name": {
+										"value": "@item().table_name ",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "Store Table Success",
+							"type": "AppendVariable",
+							"dependsOn": [
+								{
+									"activity": "Execute INGESTION PIPELINE",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "table_status",
+								"value": {
+									"value": "@{item().table_name} - Success",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Store Table Failure",
+							"type": "AppendVariable",
+							"dependsOn": [
+								{
+									"activity": "Execute INGESTION PIPELINE",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "table_status",
+								"value": {
+									"value": "@{item().table_name} - Failed",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "READ LIST OF TABLES",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select * from metadata.table_list ",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_SQL_SERVER",
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": "dbo",
+							"table_name": "customer"
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Send Consolidated email",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "INGEST ALL TABLES",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "PL_EMAIL_DEMO_MULTIPLE",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"email_recepient": {
+							"value": "@pipeline().globalParameters.email_recipent",
+							"type": "Expression"
+						},
+						"table_status": {
+							"value": "@variables('table_status')",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Fail1",
+				"type": "Fail",
+				"dependsOn": [
+					{
+						"activity": "INGEST ALL TABLES",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"message": "this pipeline has failed due to to previous activitie",
+					"errorCode": "500"
+				}
+			}
+		],
+		"variables": {
+			"table_status": {
+				"type": "Array"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-11-16T08:03:26Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

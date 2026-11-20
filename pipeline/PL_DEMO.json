@@ -1,0 +1,40 @@
+{
+	"name": "PL_DEMO",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy_sqldata",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select * from Customers where customerID >2",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_SQL_SERVER",
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": "sfef",
+							"table_name": "ffefef"
+						}
+					},
+					"firstRowOnly": true
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2026-11-14T13:07:51Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

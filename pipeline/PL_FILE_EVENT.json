@@ -1,0 +1,63 @@
+{
+	"name": "PL_FILE_EVENT",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"wildcardFolderPath": "source_folder",
+							"wildcardFileName": "*",
+							"deleteFilesAfterCompletion": false
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_Binary",
+						"type": "DatasetReference",
+						"parameters": {
+							"containe_name": "source"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_Binary_Target",
+						"type": "DatasetReference",
+						"parameters": {
+							"folder": "target_folder"
+						}
+					}
+				]
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2026-11-16T11:07:26Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
