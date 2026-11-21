@@ -47,7 +47,13 @@
 						"referenceName": "PL_Sales_Load_Staging",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true
+					"waitOnCompletion": true,
+					"parameters": {
+						"p_FileName": {
+							"value": "@concat(\n'sales_',\nformatDateTime(\nconvertFromUtc(utcNow(),'India Standard Time'),\n'yyyyMMdd'\n),\n'.csv'\n)",
+							"type": "Expression"
+						}
+					}
 				}
 			},
 			{

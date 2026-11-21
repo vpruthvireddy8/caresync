@@ -247,7 +247,13 @@
 				"inputs": [
 					{
 						"referenceName": "DS_Sales_Source",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"p_Filename": {
+								"value": "@pipeline().parameters.p_FileName",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
@@ -258,6 +264,11 @@
 				]
 			}
 		],
+		"parameters": {
+			"p_FileName": {
+				"type": "string"
+			}
+		},
 		"annotations": []
 	}
 }
