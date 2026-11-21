@@ -1,0 +1,145 @@
+{
+	"name": "PL_Sales_Incremental_Master",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup_Watermark",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT LastLoadDate\nFROM dbo.WatermarkTable\nWHERE TableName = 'SalesFact'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_Watermarktable",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Exec_Load_Staging",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "SP_Truncate_Sales_Stg",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "PL_Sales_Load_Staging",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"p_FileName": {
+							"value": "@concat(\n'sales_',\nformatDateTime(\nconvertFromUtc(utcNow(),'India Standard Time'),\n'yyyyMMdd'\n),\n'.csv'\n)",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Exec_Transform_Load",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Exec_Load_Staging",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "PL_Sales_Transform_Load",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"p_WatermarkDate": {
+							"value": "@activity('Lookup_Watermark').output.firstRow.LastLoadDate",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "SP_Update_Watermark",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Exec_Transform_Load",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[SP_UpdateWatermark]"
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_AzureSQL",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "SP_Truncate_Sales_Stg",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Lookup_Watermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[SP_Truncate_Sales_Stg]"
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_AzureSQL",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": []
+	}
+}

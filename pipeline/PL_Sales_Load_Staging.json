@@ -1,0 +1,274 @@
+{
+	"name": "PL_Sales_Load_Staging",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy_Sales_To_Stg",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 2,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "order_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "order_id"
+								}
+							},
+							{
+								"source": {
+									"name": "customer_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "customer_id"
+								}
+							},
+							{
+								"source": {
+									"name": "product_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "product_id"
+								}
+							},
+							{
+								"source": {
+									"name": "product_name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "product_name"
+								}
+							},
+							{
+								"source": {
+									"name": "category",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "category"
+								}
+							},
+							{
+								"source": {
+									"name": "quantity",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "quantity"
+								}
+							},
+							{
+								"source": {
+									"name": "price",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "price"
+								}
+							},
+							{
+								"source": {
+									"name": "discount",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "discount"
+								}
+							},
+							{
+								"source": {
+									"name": "sales_amount",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "sales_amount"
+								}
+							},
+							{
+								"source": {
+									"name": "region",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "region"
+								}
+							},
+							{
+								"source": {
+									"name": "country",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "country"
+								}
+							},
+							{
+								"source": {
+									"name": "sales_rep",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "sales_rep"
+								}
+							},
+							{
+								"source": {
+									"name": "order_date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "order_date"
+								}
+							},
+							{
+								"source": {
+									"name": "ship_date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ship_date"
+								}
+							},
+							{
+								"source": {
+									"name": "status",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "status"
+								}
+							},
+							{
+								"source": {
+									"name": "payment_type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "payment_type"
+								}
+							},
+							{
+								"source": {
+									"name": "created_date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "created_date"
+								}
+							},
+							{
+								"source": {
+									"name": "updated_date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "updated_date"
+								}
+							},
+							{
+								"source": {
+									"name": "year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "year"
+								}
+							},
+							{
+								"source": {
+									"name": "month",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "month"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_Sales_Source",
+						"type": "DatasetReference",
+						"parameters": {
+							"p_Filename": {
+								"value": "@pipeline().parameters.p_FileName",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_Sales_Stg",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"parameters": {
+			"p_FileName": {
+				"type": "string"
+			}
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,93 @@
+{
+	"name": "DF_Sales_Category_Aggregation",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_Sales_Stg",
+						"type": "DatasetReference"
+					},
+					"name": "srcstgsales"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_CategorySales",
+						"type": "DatasetReference"
+					},
+					"name": "SinkCategorySales"
+				}
+			],
+			"transformations": [
+				{
+					"name": "FilterIncremental"
+				},
+				{
+					"name": "FilterOrderDate"
+				},
+				{
+					"name": "AggCategorySales"
+				},
+				{
+					"name": "DrvLoadDate"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     p_WatermarkDate as string ('1900-01-01 00:00:00')",
+				"}",
+				"source(output(",
+				"          order_id as integer,",
+				"          customer_id as string,",
+				"          product_id as string,",
+				"          product_name as string,",
+				"          category as string,",
+				"          quantity as integer,",
+				"          price as decimal(18,2),",
+				"          discount as decimal(18,2),",
+				"          sales_amount as decimal(18,2),",
+				"          region as string,",
+				"          country as string,",
+				"          sales_rep as string,",
+				"          order_date as date,",
+				"          ship_date as date,",
+				"          status as string,",
+				"          payment_type as string,",
+				"          created_date as timestamp,",
+				"          updated_date as timestamp,",
+				"          year as integer,",
+				"          month as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> srcstgsales",
+				"srcstgsales filter(updated_date > toTimestamp($p_WatermarkDate)) ~> FilterIncremental",
+				"FilterIncremental filter(year(order_date) == 2026) ~> FilterOrderDate",
+				"FilterOrderDate aggregate(groupBy(category),",
+				"     total_sales = sum(sales_amount),",
+				"          order_count = count(order_id)) ~> AggCategorySales",
+				"AggCategorySales derive(load_date = currentUTC()) ~> DrvLoadDate",
+				"DrvLoadDate sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          category as string,",
+				"          total_sales as decimal(18,2),",
+				"          order_count as integer,",
+				"          load_date as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> SinkCategorySales"
+			]
+		}
+	}
+}
