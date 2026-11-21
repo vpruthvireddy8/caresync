@@ -32,7 +32,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "Lookup_Watermark",
+						"activity": "SP_Truncate_Sales_Stg",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -106,6 +106,33 @@
 				"userProperties": [],
 				"typeProperties": {
 					"storedProcedureName": "[dbo].[SP_UpdateWatermark]"
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_AzureSQL",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "SP_Truncate_Sales_Stg",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Lookup_Watermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[SP_Truncate_Sales_Stg]"
 				},
 				"linkedServiceName": {
 					"referenceName": "LS_AzureSQL",
