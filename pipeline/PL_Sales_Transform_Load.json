@@ -17,7 +17,13 @@
 				"typeProperties": {
 					"dataflow": {
 						"referenceName": "DF_Sales_Category_Aggregation",
-						"type": "DataFlowReference"
+						"type": "DataFlowReference",
+						"parameters": {
+							"p_WatermarkDate": {
+								"value": "'@{pipeline().parameters.p_WatermarkDate}'",
+								"type": "Expression"
+							}
+						}
 					},
 					"compute": {
 						"coreCount": 8,
@@ -27,6 +33,11 @@
 				}
 			}
 		],
+		"parameters": {
+			"p_WatermarkDate": {
+				"type": "string"
+			}
+		},
 		"annotations": []
 	}
 }

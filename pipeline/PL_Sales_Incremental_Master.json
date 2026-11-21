@@ -70,7 +70,13 @@
 						"referenceName": "PL_Sales_Transform_Load",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true
+					"waitOnCompletion": true,
+					"parameters": {
+						"p_WatermarkDate": {
+							"value": "@activity('Lookup_Watermark').output.firstRow.LastLoadDate",
+							"type": "Expression"
+						}
+					}
 				}
 			},
 			{
