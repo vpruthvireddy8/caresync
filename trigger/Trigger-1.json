@@ -16,14 +16,14 @@
 			"recurrence": {
 				"frequency": "Day",
 				"interval": 1,
-				"startTime": "2026-11-23T11:40:00",
+				"startTime": "2026-11-21T20:12:00",
 				"timeZone": "India Standard Time",
 				"schedule": {
 					"minutes": [
-						33
+						15
 					],
 					"hours": [
-						19
+						20
 					]
 				}
 			}
