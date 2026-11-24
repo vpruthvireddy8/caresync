@@ -138,6 +138,19 @@
 					"referenceName": "LS_AzureSQL",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Fail1",
+				"type": "Fail",
+				"dependsOn": [
+					{
+						"activity": "Exec_Load_Staging",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"userProperties": []
 			}
 		],
 		"annotations": []
